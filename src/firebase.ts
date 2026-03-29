@@ -1,7 +1,9 @@
-// Mock Firebase for Demo Purposes
+import { supabase } from './lib/supabase';
+
 export const auth = {
   currentUser: null as any,
   signOut: async () => {
+    await supabase.auth.signOut();
     auth.currentUser = null;
     if (authUpdateListener) authUpdateListener(null);
   }
@@ -11,129 +13,59 @@ let authUpdateListener: ((user: any) => void) | null = null;
 
 export const onAuthStateChanged = (authInstance: any, callback: (user: any) => void) => {
   authUpdateListener = callback;
-  callback(auth.currentUser);
-  return () => { authUpdateListener = null; };
+  
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    const u = session?.user ? {
+      uid: session.user.id,
+      email: session.user.email,
+      displayName: session.user.user_metadata?.username || session.user.email?.split('@')[0],
+      photoURL: null,
+    } : null;
+    auth.currentUser = u;
+    callback(u);
+  });
+
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const u = session?.user ? {
+      uid: session.user.id,
+      email: session.user.email,
+      displayName: session.user.user_metadata?.username || session.user.email?.split('@')[0],
+      photoURL: null,
+    } : null;
+    auth.currentUser = u;
+    if (authUpdateListener) authUpdateListener(u);
+  });
+
+  return () => { 
+    subscription.unsubscribe();
+    authUpdateListener = null; 
+  };
 };
 
 export const signInWithPopup = async (authInstance: any, provider: any) => {
-  const mockUser = {
-    uid: 'demo-user-123',
-    email: 'demo@techintel.ai',
-    displayName: 'Demo User',
-    photoURL: 'https://picsum.photos/seed/demo/200/200',
-    emailVerified: true,
-    providerData: []
-  };
-  auth.currentUser = mockUser;
-  if (authUpdateListener) authUpdateListener(mockUser);
-  return { user: mockUser };
+  const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
+  if (error) throw error;
+  return data;
 };
 
 export const signInWithEmailAndPassword = async (authInstance: any, email: string, password?: string) => {
-  const mockUser = {
-    uid: 'demo-user-123',
-    email: email,
-    displayName: email.split('@')[0],
-    photoURL: 'https://picsum.photos/seed/demo/200/200',
-    emailVerified: true,
-    providerData: []
-  };
-  auth.currentUser = mockUser;
-  if (authUpdateListener) authUpdateListener(mockUser);
-  return { user: mockUser };
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password: password || '' });
+  if (error) throw error;
+  return { user: data.user };
 };
 
 export const createUserWithEmailAndPassword = async (authInstance: any, email: string, password?: string) => {
-  const mockUser = {
-    uid: 'demo-user-123',
-    email: email,
-    displayName: email.split('@')[0],
-    photoURL: 'https://picsum.photos/seed/demo/200/200',
-    emailVerified: true,
-    providerData: []
-  };
-  auth.currentUser = mockUser;
-  if (authUpdateListener) authUpdateListener(mockUser);
-  return { user: mockUser };
+  const { data, error } = await supabase.auth.signUp({ email, password: password || '' });
+  if (error) throw error;
+  return { user: data.user };
 };
 
 export const updateProfile = async (user: any, data: any) => {
-  if (auth.currentUser) {
-    auth.currentUser.displayName = data.displayName;
-    if (authUpdateListener) authUpdateListener(auth.currentUser);
-  }
+  await supabase.auth.updateUser({ data: { username: data.displayName } });
 };
 
 export const googleProvider = {};
-export const db = {} as any;
-
-// Mock Firestore functions
-export const collection = (...args: any[]) => ({});
-export const doc = (...args: any[]) => ({});
-export const setDoc = async (...args: any[]) => {};
-export const getDoc = async (...args: any[]) => ({ exists: () => false, data: () => ({}) });
-export const addDoc = async (...args: any[]) => ({ id: 'mock-id' });
-export const query = (...args: any[]) => ({});
-export const where = (...args: any[]) => ({});
-export const orderBy = (...args: any[]) => ({});
-export const onSnapshot = (ref: any, callback: any) => {
-  // Simulate fetching history for demo user
-  if (auth.currentUser?.uid === 'demo-user-123') {
-    setTimeout(() => {
-      callback({
-        docs: [
-          {
-            id: 'demo-1',
-            data: () => ({
-              technology: 'Quantum Computing',
-              trl: 4,
-              hypeCycle: 'Innovation Trigger',
-              timestamp: { toDate: () => new Date(Date.now() - 86400000) },
-              summary: 'Quantum computing uses quantum-mechanical phenomena such as superposition and entanglement to perform computation.'
-            })
-          },
-          {
-            id: 'demo-2',
-            data: () => ({
-              technology: 'Solid-State Batteries',
-              trl: 6,
-              hypeCycle: 'Peak of Inflated Expectations',
-              timestamp: { toDate: () => new Date(Date.now() - 172800000) },
-              summary: 'Solid-state batteries use solid electrodes and a solid electrolyte, instead of the liquid or polymer gel electrolytes found in lithium-ion batteries.'
-            })
-          },
-          {
-            id: 'demo-3',
-            data: () => ({
-              technology: 'Generative AI',
-              trl: 8,
-              hypeCycle: 'Plateau of Productivity',
-              timestamp: { toDate: () => new Date(Date.now() - 259200000) },
-              summary: 'Generative AI refers to artificial intelligence systems capable of generating text, images, or other media in response to prompts.'
-            })
-          }
-        ]
-      });
-    }, 500);
-  } else {
-    callback({ docs: [] });
-  }
-  return () => {};
-};
-export const Timestamp = { now: () => new Date() };
-
-export enum OperationType {
-  CREATE = 'create',
-  UPDATE = 'update',
-  DELETE = 'delete',
-  LIST = 'list',
-  GET = 'get',
-  WRITE = 'write',
-}
-
-export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
-  console.warn('Mock Firestore Error (Demo Mode):', error);
-}
+export const db = {} as any; // Legacy export to avoid breaking existing imports where unused
 
 export type User = {
   uid: string;

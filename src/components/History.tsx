@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { User, db, collection, query, orderBy, onSnapshot } from '../firebase';
+import { User } from '../firebase';
+import { supabase } from '../lib/supabase';
 import { History as HistoryIcon, Search, Clock, ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface HistoryItem {
   id: string;
   technology: string;
-  timestamp: any;
+  timestamp: string;
   summary: string;
   trl: number;
   hypeCycle: string;
@@ -21,21 +22,31 @@ export function HistoryView({ user }: { user: User | null }) {
       setLoading(false);
       return;
     }
-    const q = query(
-      collection(db, `users/${user.uid}/history`),
-      orderBy('timestamp', 'desc')
-    );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const items = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as HistoryItem[];
-      setHistory(items);
+    const fetchHistory = async () => {
+      const { data, error } = await supabase
+        .from('prediction_history')
+        .select('*')
+        .eq('user_id', user.uid)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching history:', error);
+      } else if (data) {
+        const items = data.map((row: any) => ({
+          id: row.id,
+          technology: row.prediction_data.technology,
+          timestamp: row.created_at,
+          summary: row.prediction_data.summary,
+          trl: row.prediction_data.trl,
+          hypeCycle: row.prediction_data.hypeCycle,
+        }));
+        setHistory(items);
+      }
       setLoading(false);
-    });
+    };
 
-    return () => unsubscribe();
+    fetchHistory();
   }, [user?.uid]);
 
   return (
@@ -78,7 +89,7 @@ export function HistoryView({ user }: { user: User | null }) {
                     <div className="flex items-center gap-3 text-xs text-white/30 mt-1">
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
-                        {item.timestamp?.toDate().toLocaleDateString()}
+                        {item.timestamp ? new Date(item.timestamp).toLocaleDateString() : 'N/A'}
                       </span>
                       <span className="px-2 py-0.5 bg-white/5 rounded flex items-center gap-1">
                         {item.hypeCycle}

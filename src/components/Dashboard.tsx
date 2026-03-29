@@ -6,6 +6,7 @@ import { analyzeTechnology, TechAnalysis } from '../services/geminiService';
 import { ForecastChart, HypeCycleChart, TRLTracker } from './Charts';
 import ReactMarkdown from 'react-markdown';
 import { AuthModal } from './AuthModal';
+import { supabase } from '../lib/supabase';
 
 interface DashboardProps {
   user: User | null;
@@ -34,6 +35,19 @@ export function Dashboard({ user, initialSearch, onSearchHandled }: DashboardPro
     try {
       const result = await analyzeTechnology(searchQuery);
       setAnalysis(result);
+      
+      // Store in Supabase Prediction History
+      if (user) {
+        await supabase.from('prediction_history').insert({
+          user_id: user.uid,
+          prediction_data: {
+            technology: searchQuery,
+            summary: result.summary,
+            trl: result.trl,
+            hypeCycle: result.hypeCycle
+          }
+        });
+      }
     } catch (error) {
       console.error("Analysis failed:", error);
     } finally {
