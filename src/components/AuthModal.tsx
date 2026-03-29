@@ -94,7 +94,7 @@ export function AuthModal({ isOpen, onClose, title = "Welcome to TechIntel AI", 
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative w-full max-w-lg bg-[#0a0a0a] border border-white/10 rounded-3xl p-8 shadow-2xl overflow-hidden"
+            className="relative w-full max-w-lg bg-[var(--card-bg)] border border-white/10 rounded-3xl p-8 shadow-2xl overflow-hidden"
           >
             {/* Background Glow */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-blue-600/20 blur-[80px] rounded-full pointer-events-none" />
@@ -176,10 +176,10 @@ export function AuthModal({ isOpen, onClose, title = "Welcome to TechIntel AI", 
                         onChange={(e) => setGender(e.target.value)}
                         className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-blue-500 transition-colors appearance-none"
                       >
-                        <option value="male" className="bg-[#0a0a0a]">Male</option>
-                        <option value="female" className="bg-[#0a0a0a]">Female</option>
-                        <option value="other" className="bg-[#0a0a0a]">Other</option>
-                        <option value="prefer_not_to_say" className="bg-[#0a0a0a]">Prefer not to say</option>
+                        <option value="male" className="bg-[var(--card-bg)]">Male</option>
+                        <option value="female" className="bg-[var(--card-bg)]">Female</option>
+                        <option value="other" className="bg-[var(--card-bg)]">Other</option>
+                        <option value="prefer_not_to_say" className="bg-[var(--card-bg)]">Prefer not to say</option>
                       </select>
                     </div>
                   </div>
@@ -200,7 +200,7 @@ export function AuthModal({ isOpen, onClose, title = "Welcome to TechIntel AI", 
                   <div className="w-full border-t border-white/10"></div>
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-[#0a0a0a] px-4 text-white/30">Or continue with</span>
+                  <span className="bg-[var(--card-bg)] px-4 text-white/30">Or continue with</span>
                 </div>
               </div>
 

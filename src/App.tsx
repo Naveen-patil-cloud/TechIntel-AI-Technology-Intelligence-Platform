@@ -28,6 +28,8 @@ export default function App() {
       // Only redirect to dashboard when user first logs in (was logged out before)
       if (user && wasLoggedOutRef.current) {
         setActiveTab('dashboard');
+      } else if (!user && !wasLoggedOutRef.current) {
+        setActiveTab('home');
       }
       wasLoggedOutRef.current = !user;
     });
@@ -45,7 +47,7 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--app-bg)] flex items-center justify-center">
         <motion.div
           animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 2, repeat: Infinity }}
@@ -58,7 +60,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white selection:bg-blue-500/30">
+    <div className="min-h-screen bg-[var(--app-bg)] text-white selection:bg-blue-500/30">
       <Toaster position="top-right" theme="dark" />
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
       
@@ -70,7 +72,7 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <Auth onLogin={handleLogin} />
+            <Auth onLogin={handleLogin} onAnalyze={handleAnalyze} />
           </motion.div>
         ) : activeTab === 'home' && user ? (
           <motion.div
@@ -79,7 +81,7 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <Auth onLogin={() => setActiveTab('dashboard')} />
+            <Auth onLogin={() => setActiveTab('dashboard')} onAnalyze={handleAnalyze} />
           </motion.div>
         ) : (
           <motion.div

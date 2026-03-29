@@ -6,8 +6,24 @@
 }
 
 @layer base {
+  :root {
+    --app-bg: #050505;
+    --card-bg: #0a0a0a;
+  }
+
+  :root[data-theme="midnight"] {
+    --app-bg: #1a2532;
+    --card-bg: #19192c;
+  }
+
+  :root[data-theme="cyberpunk"] {
+    --app-bg: #0d0208;
+    --card-bg: #1a0512;
+  }
+
   body {
-    @apply bg-[#050505] text-white antialiased;
+    @apply text-white antialiased transition-colors duration-500;
+    background-color: var(--app-bg);
   }
 
   ::-webkit-scrollbar {
@@ -22,6 +38,7 @@
     @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
   }
 }
+
 
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;

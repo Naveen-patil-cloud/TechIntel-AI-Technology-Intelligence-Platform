@@ -4,9 +4,10 @@ import { motion, AnimatePresence } from 'motion/react';
 
 interface AuthProps {
   onLogin: () => void;
+  onAnalyze?: (tech: string) => void;
 }
 
-export function Auth({ onLogin }: AuthProps) {
+export function Auth({ onLogin, onAnalyze }: AuthProps) {
   const [view, setView] = useState<'landing' | 'trends'>('landing');
   const [searchQuery, setSearchQuery] = useState('');
   const [marketData, setMarketData] = useState<any[]>([]);
@@ -41,7 +42,7 @@ export function Auth({ onLogin }: AuthProps) {
     : [];
 
   return (
-    <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-[var(--app-bg)] flex flex-col items-center justify-center p-6 relative overflow-hidden">
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute top-1/4 right-1/4 w-[400px] h-[400px] bg-purple-600/5 blur-[100px] rounded-full pointer-events-none" />
@@ -144,7 +145,7 @@ export function Auth({ onLogin }: AuthProps) {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="absolute top-full left-0 w-full mt-2 bg-[#0a0a0a] border border-white/10 rounded-2xl overflow-hidden z-50 shadow-2xl"
+                    className="absolute top-full left-0 w-full mt-2 bg-[var(--card-bg)] border border-white/10 rounded-2xl overflow-hidden z-50 shadow-2xl"
                   >
                     {suggestions.map((item, i) => (
                       <button
@@ -174,7 +175,8 @@ export function Auth({ onLogin }: AuthProps) {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
-                    className="p-6 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all group"
+                    onClick={() => onAnalyze?.(item.name)}
+                    className="p-6 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all group cursor-pointer"
                   >
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-3">

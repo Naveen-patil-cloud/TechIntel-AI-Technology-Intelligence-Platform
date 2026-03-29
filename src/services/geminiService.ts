@@ -1,6 +1,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY || "" });
 
 export interface TechAnalysis {
   summary: string;
@@ -16,7 +16,7 @@ export async function analyzeTechnology(tech: string): Promise<TechAnalysis> {
   const model = "gemini-2.5-flash";
   
   try {
-    if (!process.env.GEMINI_API_KEY) {
+    if (!import.meta.env.VITE_GEMINI_API_KEY) {
       throw new Error("Missing Gemini API Key");
     }
 

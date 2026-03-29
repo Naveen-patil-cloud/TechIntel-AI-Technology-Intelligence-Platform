@@ -30,6 +30,10 @@ export function ProfileModal({ isOpen, onClose, user, initialTab = 'profile' }: 
   }, [initialTab]);
 
   useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  useEffect(() => {
     if (isOpen) {
       setDisplayName(user.displayName || '');
       setIsEditing(false);
@@ -73,7 +77,7 @@ export function ProfileModal({ isOpen, onClose, user, initialTab = 'profile' }: 
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="w-full max-w-2xl bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+            className="w-full max-w-2xl bg-[var(--card-bg)] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -288,7 +292,7 @@ export function ProfileModal({ isOpen, onClose, user, initialTab = 'profile' }: 
                         </div>
                         <div className="grid grid-cols-3 gap-2">
                           {[
-                            { id: 'dark', label: 'Dark', colors: 'bg-[#050505] border-blue-500/30' },
+                            { id: 'dark', label: 'Dark', colors: 'bg-[var(--app-bg)] border-blue-500/30' },
                             { id: 'midnight', label: 'Midnight', colors: 'bg-[#0a0a2e] border-indigo-500/30' },
                             { id: 'cyberpunk', label: 'Cyberpunk', colors: 'bg-[#0d0208] border-pink-500/30' },
                           ].map((t) => (
@@ -379,13 +383,13 @@ export function ProfileModal({ isOpen, onClose, user, initialTab = 'profile' }: 
                           }}
                           className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white outline-none focus:border-blue-500/50 transition-all appearance-none cursor-pointer"
                         >
-                          <option value="en" className="bg-[#0a0a0a]">English</option>
-                          <option value="es" className="bg-[#0a0a0a]">Español</option>
-                          <option value="fr" className="bg-[#0a0a0a]">Français</option>
-                          <option value="de" className="bg-[#0a0a0a]">Deutsch</option>
-                          <option value="ja" className="bg-[#0a0a0a]">日本語</option>
-                          <option value="zh" className="bg-[#0a0a0a]">中文</option>
-                          <option value="hi" className="bg-[#0a0a0a]">हिन्दी</option>
+                          <option value="en" className="bg-[var(--card-bg)]">English</option>
+                          <option value="es" className="bg-[var(--card-bg)]">Español</option>
+                          <option value="fr" className="bg-[var(--card-bg)]">Français</option>
+                          <option value="de" className="bg-[var(--card-bg)]">Deutsch</option>
+                          <option value="ja" className="bg-[var(--card-bg)]">日本語</option>
+                          <option value="zh" className="bg-[var(--card-bg)]">中文</option>
+                          <option value="hi" className="bg-[var(--card-bg)]">हिन्दी</option>
                         </select>
                       </div>
                     </div>

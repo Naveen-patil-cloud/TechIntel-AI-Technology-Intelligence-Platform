@@ -59,7 +59,7 @@ export function Layout({ user, children, activeTab, setActiveTab }: LayoutProps)
       )}
       
       {/* Sidebar */}
-      <aside className={`${isSidebarOpen ? 'w-64' : 'w-0'} bg-[#0a0a0a] border-r border-white/5 flex flex-col transition-all duration-300 overflow-hidden relative z-50`}>
+      <aside className={`${isSidebarOpen ? 'w-64' : 'w-0'} bg-[var(--card-bg)] border-r border-white/5 flex flex-col transition-all duration-300 overflow-hidden relative z-50`}>
         <div className="p-6 min-w-[256px]">
           <div className="flex items-center justify-between mb-8">
             <div 
@@ -147,9 +147,9 @@ export function Layout({ user, children, activeTab, setActiveTab }: LayoutProps)
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto bg-[#050505] relative flex flex-col">
+      <main className="flex-1 overflow-y-auto bg-[var(--app-bg)] relative flex flex-col">
         {/* Top Bar */}
-        <header className="h-16 border-b border-white/5 bg-[#050505]/80 backdrop-blur-md flex items-center justify-between px-8 sticky top-0 z-40">
+        <header className="h-16 border-b border-white/5 bg-[var(--app-bg)]/80 backdrop-blur-md flex items-center justify-between px-8 sticky top-0 z-40">
           <div className="flex items-center gap-4">
             {!isSidebarOpen && (
               <button 
@@ -179,7 +179,7 @@ export function Layout({ user, children, activeTab, setActiveTab }: LayoutProps)
               </button>
 
               {isProfileMenuOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-[#0a0a0a] border border-white/10 rounded-xl shadow-2xl py-2 z-50 overflow-hidden">
+                <div className="absolute right-0 mt-2 w-56 bg-[var(--card-bg)] border border-white/10 rounded-xl shadow-2xl py-2 z-50 overflow-hidden">
                   <div className="px-4 py-3 border-b border-white/5 bg-white/5 mb-1">
                     <p className="text-sm font-bold text-white truncate">{displayName}</p>
                     <p className="text-xs text-white/40 truncate">{user.email}</p>
