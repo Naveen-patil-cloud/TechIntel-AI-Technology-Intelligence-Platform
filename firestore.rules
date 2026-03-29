@@ -1,0 +1,100 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: userId (UID)
+    // Fields:
+    //   - uid: string (required)
+    //   - email: string (required, email format)
+    //   - username: string (required)
+    //   - dob: string (optional, date format)
+    //   - gender: string (optional, enum)
+    //   - displayName: string (optional)
+    //   - photoURL: string (optional)
+    //   - createdAt: timestamp (required)
+    //
+    // Collection: users/{userId}/history
+    // Document ID: historyId
+    // Fields:
+    //   - userId: string (required)
+    //   - technology: string (required)
+    //   - timestamp: timestamp (required)
+    //   - summary: string (optional)
+    //   - trl: number (optional)
+    //   - hypeCycle: string (optional)
+    //
+    // Collection: users/{userId}/comparisons
+    // Document ID: comparisonId
+    // Fields:
+    //   - userId: string (required)
+    //   - techs: list (required)
+    //   - timestamp: timestamp (required)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email', 'username']) &&
+             data.uid is string &&
+             data.email is string && isValidEmail(data.email) &&
+             data.username is string && data.username.size() > 0 && data.username.size() < 50 &&
+             (!('dob' in data) || (data.dob is string && data.dob.matches("^\\d{4}-\\d{2}-\\d{2}$"))) &&
+             (!('gender' in data) || (data.gender in ['male', 'female', 'other', 'prefer_not_to_say']));
+    }
+
+    function isValidHistory(data) {
+      return data.keys().hasAll(['userId', 'technology', 'timestamp']) &&
+             data.userId is string &&
+             data.technology is string && data.technology.size() > 0 && data.technology.size() < 100 &&
+             data.timestamp is timestamp;
+    }
+
+    function isValidComparison(data) {
+      return data.keys().hasAll(['userId', 'techs', 'timestamp']) &&
+             data.userId is string &&
+             data.techs is list && data.techs.size() >= 2 && data.techs.size() <= 5 &&
+             data.timestamp is timestamp;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data) &&
+                      request.resource.data.uid == resource.data.uid;
+      
+      match /history/{historyId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidHistory(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+
+      match /comparisons/{comparisonId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidComparison(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+    }
+  }
+}

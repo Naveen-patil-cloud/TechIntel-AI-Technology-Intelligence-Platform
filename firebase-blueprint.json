@@ -1,0 +1,59 @@
+{
+  "entities": {
+    "user": {
+      "title": "User",
+      "description": "User profile and search history",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "username": { "type": "string" },
+        "dob": { "type": "string", "format": "date" },
+        "gender": { "type": "string", "enum": ["male", "female", "other", "prefer_not_to_say"] },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "username"]
+    },
+    "searchHistory": {
+      "title": "Search History",
+      "description": "History of technology searches",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "technology": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "summary": { "type": "string" },
+        "trl": { "type": "number" },
+        "hypeCycle": { "type": "string" }
+      },
+      "required": ["userId", "technology", "timestamp"]
+    },
+    "comparison": {
+      "title": "Technology Comparison",
+      "description": "Saved comparisons between technologies",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "techs": { "type": "array", "items": { "type": "string" } },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "techs", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "user",
+      "description": "User profile data"
+    },
+    "/users/{userId}/history/{historyId}": {
+      "schema": "searchHistory",
+      "description": "User's technology search history"
+    },
+    "/users/{userId}/comparisons/{comparisonId}": {
+      "schema": "comparison",
+      "description": "User's saved comparisons"
+    }
+  }
+}
